@@ -182,7 +182,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.20 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.21 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="introModal">
@@ -196,6 +196,7 @@
 <div class="modal" id="cardModal">
   <div class="modal-box">
     <div class="mtitle"><span>이미지 카드</span><button class="mclose" id="cardClose">×</button></div>
+    <div class="nameField" id="nameField" style="display:none"><label>받는 분 이름</label><input type="text" id="cardName" placeholder="예: 홍길동"></div>
     <img id="cardImg" alt="예상 수수료·시책 카드">
     <div class="modal-actions">
       <button class="btn-save" id="cardSave">저장</button>
@@ -437,7 +438,7 @@ const DISCL=['※ 상기 금액은 세금 공제 전 금액입니다.','※ 수�
 function wrapText(g,t,mw){const out=[];let ln='';for(const ch of t){const ts=ln+ch;if(g.measureText(ts).width>mw&&ln){out.push(ln);ln=ch;}else ln=ts;}if(ln)out.push(ln);return out;}
 function cardData(){
   const c=CALCS[cur],st=baseV(),r=c.compute(st);
-  const name=(c.sabun&&lookup)?lookup.name:'';
+  const auto=(c.sabun&&lookup)?lookup.name:'';const mEl=$('cardName');const name=auto||(mEl?mEl.value.trim():'');
   const rows=r.rows.filter(x=>x.v>0);
   const eyebrow=(c.sabun&&lookup)?(lookup.mon+'차월 / '+lookup.act):c.title;
   const title=name?name+'님 예상 수수료·시책':'예상 수수료·시책 안내';
@@ -474,7 +475,7 @@ function tplA(g,D,dl){let yy=OUT+IN;
   g.fillStyle=CTHEME.main;g.font='700 26px '+F;g.textAlign='left';g.fillText(D.eyebrow,x0,yy);yy+=36;
   g.fillStyle='#16181D';g.font='800 52px '+F;g.fillText(D.title,x0,yy);yy+=72;
   g.fillStyle=CTHEME.main;g.font='800 120px '+F;g.fillText(D.total,x0,yy);const nw=g.measureText(D.total).width;
-  g.fillStyle='#16181D';g.font='800 52px '+F;g.fillText('원',x0+nw+18,yy+58);yy+=132;
+  g.fillStyle='#16181D';g.font='800 52px '+F;g.fillText('원',x0+nw+18,yy+58);yy+=162;
   g.fillStyle='#5B6068';g.font='500 26px '+F;g.fillText(D.ctxt,x0,yy);yy+=52;
   const subW=(cw-24)/2;D.r.subs.slice(0,2).forEach((s,i)=>{const sx=x0+i*(subW+24);
     g.fillStyle='#F7F8FA';rr(g,sx,yy,subW,150,16);g.fill();
@@ -542,12 +543,13 @@ async function renderCard(){
   bg.addColorStop(0,CTHEME.bg1);bg.addColorStop(1,CTHEME.bg2);
   g.fillStyle=bg;g.fillRect(0,0,W,H);
   g.fillStyle='#fff';rr(g,OUT,OUT,W-2*OUT,H-2*OUT,40);g.fill();
-  g.strokeStyle=CTHEME.border;g.lineWidth=2;rr(g,OUT,OUT,W-2*OUT,H-2*OUT,40);g.stroke();
+  g.strokeStyle=CTHEME.main;g.lineWidth=7;rr(g,OUT+3,OUT+3,W-2*OUT-6,H-2*OUT-6,38);g.stroke();
   g.textBaseline='top';draw(g,D,dl);
   $('cardImg').src=cv.toDataURL('image/png');cv.toBlob(b=>{cardBlob=b;},'image/png');
 }
-$('cardBtn').onclick=async()=>{$('cardModal').classList.add('show');await renderCard();};
+$('cardBtn').onclick=async()=>{const auto=(CALCS[cur].sabun&&lookup);$('nameField').style.display=auto?'none':'';$('cardModal').classList.add('show');await renderCard();};
 $('cardClose').onclick=()=>$('cardModal').classList.remove('show');
+let cnTimer=null;$('cardName').addEventListener('input',()=>{clearTimeout(cnTimer);cnTimer=setTimeout(renderCard,200);});
 $('cardModal').addEventListener('click',e=>{if(e.target===$('cardModal'))$('cardModal').classList.remove('show');});
 document.querySelectorAll('#tplRow button').forEach(b=>{b.onclick=()=>{cardTpl=b.dataset.tpl;document.querySelectorAll('#tplRow button').forEach(x=>x.classList.toggle('on',x===b));renderCard();};});
 $('cardSave').onclick=()=>{const a=document.createElement('a');a.href=$('cardImg').src;a.download='예상수수료카드.png';a.click();};
