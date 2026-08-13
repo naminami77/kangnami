@@ -29,7 +29,7 @@
   .hero p{margin-top:10px;color:var(--ink-soft);font-size:clamp(14px,2.2vw,16px);max-width:620px}
   .wrap{max-width:1120px;margin:0 auto;padding:22px 20px 48px}
   .lookup{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px}
-  .lookup-head{font-size:13px;font-weight:700;color:var(--ink-faint);letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+  .lookup-head{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.01em;margin-bottom:14px}
   .lookup-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .lookup-row input{flex:0 0 200px;font-family:inherit;font-size:16px;font-weight:700;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px}
   .lookup-row input:focus{outline:none;border-color:var(--red)}
@@ -131,7 +131,21 @@
   .calc-btn:active{background:var(--red-dark)}
   .calc-btn:disabled{background:#D7DADF;cursor:not-allowed}
   .result-ph{color:var(--ink-faint);font-size:14px;text-align:center;padding:44px 20px;line-height:1.7}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+    .name-hint{font-size:11.5px;color:var(--ink-faint);margin-top:6px}
+  .crit-btn{width:100%;margin-top:14px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--red-dark);background:var(--red-soft);border:none;border-radius:11px;padding:12px;cursor:pointer}
+  .crit-btn:active{opacity:.85}
+  .crit-body{font-size:13.5px;line-height:1.7;color:var(--ink)}
+  .crit-body ul{list-style:none;padding:0;margin:0}
+  .crit-body li{position:relative;padding-left:15px;margin-bottom:8px;font-weight:500}
+  .crit-body li::before{content:"\00B7";position:absolute;left:2px;color:var(--red);font-weight:800}
+  .crit-body .sub{color:var(--ink-faint);font-size:12.5px}
+  .crit-sub-title{font-weight:800;margin:16px 0 10px;color:var(--red-dark)}
+  .crit-sub-title span{font-weight:600;color:var(--ink-soft);font-size:12.5px}
+  .hand{display:inline-block;animation:handbob 1s ease-in-out infinite}
+  @keyframes handbob{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+  .shine{background:linear-gradient(90deg,var(--red-dark) 0%,var(--red-dark) 38%,#FF8AA3 50%,var(--red-dark) 62%,var(--red-dark) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:shine 2.4s linear infinite}
+  @keyframes shine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -147,7 +161,7 @@
   </section>
   <div class="wrap">
     <div class="lookup">
-      <div class="lookup-head">🔎 사번으로 조회</div>
+      <div class="lookup-head"><span class="hand">👉</span> <span class="shine">사번으로 조회</span></div>
       <div class="lookup-row">
         <input type="text" id="sabun" inputmode="numeric" placeholder="사번(조직코드) 입력" autocomplete="off">
         <button id="lookupBtn">조회</button>
@@ -163,6 +177,7 @@
         <div class="card-sub" id="calcSub"></div>
         <div id="derived"></div>
         <div id="inputs"></div>
+        <button class="crit-btn" id="critBtn">📋 시책 인정 기준 보기</button>
         <button class="calc-btn" id="calcBtn" disabled>수수료 계산</button>
       </div>
       <div class="card">
@@ -182,8 +197,33 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.21 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.23 · 데이터 기준 2608</div>
   </footer>
+
+<div class="modal" id="critModal">
+  <div class="modal-box">
+    <div class="mtitle"><span>📋 시책 인정 기준</span><button class="mclose" id="critClose">×</button></div>
+    <div class="crit-body">
+      <ul>
+        <li>위촉일 · 입력일 기준으로 인정</li>
+        <li>실손 불인정 (실손 · 노후 · 전환 · 유병자실손)<br><span class="sub">↳ 일반 상품 동시 가입 시에도 실손은 불인정</span></li>
+        <li>단체보험 · 운전자 상해 종합(단체형) · 성공파트너 종합 불인정</li>
+        <li>보장성 구성비 30% 미만 계약은 실적 제외</li>
+        <li>25회차 이내 승환 계약 제외</li>
+        <li>월 마감 기준 지급 대상자 해촉(폐쇄) 시 지급 불가</li>
+        <li>각 지급 시책만큼 소득 귀속 처리</li>
+        <li>자기계약은 파트너스 순수신인만 인정</li>
+        <li>그 외 &#39;시책 인정 공통 기준&#39; 적용</li>
+      </ul>
+      <div class="crit-sub-title">계약 건전성 강화 <span>(수수료 분급 적용)</span></div>
+      <ul>
+        <li>본인계약 + 가상계좌 → 분급</li>
+        <li>타인계약 + 가상계좌 + 20만원 이상 → 분급<br><span class="sub">(피보험자 합산 20만원 이상 포함)</span></li>
+      </ul>
+    </div>
+    <div class="modal-actions"><button class="btn-save" id="critOk">확인</button></div>
+  </div>
+</div>
 
 <div class="modal" id="introModal">
   <div class="modal-box">
@@ -196,7 +236,7 @@
 <div class="modal" id="cardModal">
   <div class="modal-box">
     <div class="mtitle"><span>이미지 카드</span><button class="mclose" id="cardClose">×</button></div>
-    <div class="nameField" id="nameField" style="display:none"><label>받는 분 이름</label><input type="text" id="cardName" placeholder="예: 홍길동"></div>
+    <div class="nameField" id="nameField" style="display:none"><label>받는 분 이름</label><input type="text" id="cardName" placeholder="예: 홍길동"><div class="name-hint">받는 사람의 이름을 입력 후 엔터키를 눌러주세요.</div></div>
     <img id="cardImg" alt="예상 수수료·시책 카드">
     <div class="modal-actions">
       <button class="btn-save" id="cardSave">저장</button>
@@ -425,6 +465,7 @@ $('sabun').addEventListener('keydown',e=>{if(e.key==='Enter')doLookup();});
 // ── 이미지 카드 (템플릿 3종) ──
 const W=1080,OUT=48,IN=56,x0=OUT+IN,cw=W-2*x0,F='Pretendard,"Malgun Gothic",sans-serif';
 let CTHEME={main:'#E4002B',bg1:'#F7E9EC',bg2:'#FDF6F7',border:'#F0DADE',tag:'#FCE9EC'};
+let lastCardName='';
 function cardTheme(){
   if(cur==='N')return {main:'#E09E00',bg1:'#FBF1D8',bg2:'#FDFBF4',border:'#F0E0B0',tag:'#FBF1D8'};
   if(cur==='E2'&&lookup&&lookup.act==='Active')return {main:'#9B1C31',bg1:'#F6E7EA',bg2:'#FDF7F8',border:'#EBCDD3',tag:'#F6E7EA'};
@@ -531,7 +572,7 @@ let cardTpl='A',cardBlob=null;
 async function renderCard(){
   if(document.fonts&&document.fonts.ready){try{await document.fonts.ready;}catch(e){}}
   await ensureLogo();
-  const D=cardData();CTHEME=cardTheme();
+  const D=cardData();CTHEME=cardTheme();lastCardName=D.name;
   const mg=document.createElement('canvas').getContext('2d');mg.font='500 22px '+F;
   const dl=[];DISCL.forEach(s=>wrapText(mg,s,cw).forEach(l=>dl.push(l)));
   const draw=TPL[cardTpl];
@@ -549,15 +590,19 @@ async function renderCard(){
 }
 $('cardBtn').onclick=async()=>{const auto=(CALCS[cur].sabun&&lookup);$('nameField').style.display=auto?'none':'';$('cardModal').classList.add('show');await renderCard();};
 $('cardClose').onclick=()=>$('cardModal').classList.remove('show');
-let cnTimer=null;$('cardName').addEventListener('input',()=>{clearTimeout(cnTimer);cnTimer=setTimeout(renderCard,200);});
+$('cardName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();renderCard();}});
 $('cardModal').addEventListener('click',e=>{if(e.target===$('cardModal'))$('cardModal').classList.remove('show');});
 document.querySelectorAll('#tplRow button').forEach(b=>{b.onclick=()=>{cardTpl=b.dataset.tpl;document.querySelectorAll('#tplRow button').forEach(x=>x.classList.toggle('on',x===b));renderCard();};});
-$('cardSave').onclick=()=>{const a=document.createElement('a');a.href=$('cardImg').src;a.download='예상수수료카드.png';a.click();};
+$('cardSave').onclick=()=>{const a=document.createElement('a');a.href=$('cardImg').src;a.download=(lastCardName?lastCardName+'_수수료카드':'수수료카드')+'.png';a.click();};
 if($('brandLogo'))$('brandLogo').src=LOGO_SRC;
 renderTabs();renderCalc();showCalc(false);
 $('introClose').onclick=()=>$('introModal').classList.remove('show');
 $('introModal').addEventListener('click',e=>{if(e.target===$('introModal'))$('introModal').classList.remove('show');});
 $('introModal').classList.add('show');
+$('critBtn').onclick=()=>$('critModal').classList.add('show');
+$('critClose').onclick=()=>$('critModal').classList.remove('show');
+$('critOk').onclick=()=>$('critModal').classList.remove('show');
+$('critModal').addEventListener('click',e=>{if(e.target===$('critModal'))$('critModal').classList.remove('show');});
 </script>
 </body>
 </html>
