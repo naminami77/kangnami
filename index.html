@@ -197,7 +197,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.29 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.31 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -241,6 +241,7 @@
     <img id="cardImg" alt="예상 수수료·시책 카드">
     <div class="modal-actions">
       <button class="btn-save" id="cardSave">저장</button>
+      <button class="btn-share" id="cardShare">공유</button>
     </div>
     <div class="mhint">모바일에서는 이미지를 길게 눌러 저장할 수도 있어요.</div>
   </div>
@@ -378,7 +379,7 @@ function renderTabs(){
   const t=$('tabs');t.innerHTML='';
   TAB_ORDER.forEach(([k,label])=>{
     const b=document.createElement('button');b.className='tab'+(k===cur?' on':'');b.textContent=label;
-    b.onclick=()=>{cur=k;renderTabs();renderCalc();};t.appendChild(b);
+    b.onclick=()=>{cur=k;renderTabs();showGrid(true);renderCalc();};t.appendChild(b);
   });
 }
 function renderCalc(){
@@ -427,7 +428,9 @@ function updateCalcState(){
   if(calcShown[cur]&&ok){$('resultBody').style.display='';$('resultPlaceholder').style.display='none';compute();}
   else{$('resultBody').style.display='none';$('resultPlaceholder').style.display='';}
 }
-function showCalc(b){$('tabs').style.display=b?'':'none';$('calcGrid').style.display=b?'':'none';}
+function showTabs(b){$('tabs').style.display=b?'':'none';}
+function showGrid(b){$('calcGrid').style.display=b?'':'none';}
+function showCalc(b){showTabs(b);showGrid(b);}
 function compute(){
   const c=CALCS[cur];const st=baseV();
   const r=c.compute(st);
@@ -452,7 +455,7 @@ function doLookup(){
   const chips=$('chips'),msg=$('lookupMsg');chips.innerHTML='';msg.className='msg';
   if(!code){msg.className='msg err show';msg.textContent='사번(조직코드)을 입력하세요.';return;}
   const row=R[code];
-  if(!row){lookup=null;msg.className='msg warn show';msg.textContent='1차월 또는 교차/전속입니다. 당월 합격자의 경우 [1차월 신인] 탭에서, 당월 합격이 아닐 경우 [2차월 이상 또는 경력] 탭에서, 그 외 [교차/전속] 탭에서 계산해주세요.';cur='N';renderTabs();renderCalc();showCalc(true);return;}
+  if(!row){lookup=null;cur=null;renderTabs();showTabs(true);showGrid(false);msg.className='msg warn show';msg.textContent='1차월 또는 교차/전속입니다. 아래에서 해당 탭을 선택해주세요. 당월 합격자의 경우 [1차월 신인], 당월 합격이 아닐 경우 [2차월 이상 또는 경력], 그 외 [교차/전속] 탭.';return;}
   const [name,ai,mon,fi,bi]=row;
   lookup={name,act:ACT[ai],mon,fee:FEE[fi],branch:(bi!=null?BRANCH[bi]:'')};
   const ac=lookup.act==='Active'?'maroon':(lookup.act==='Chance'?'navy':'hl');
@@ -605,6 +608,8 @@ $('cardBranch').addEventListener('input',cardLive);
 $('cardModal').addEventListener('click',e=>{if(e.target===$('cardModal'))$('cardModal').classList.remove('show');});
 document.querySelectorAll('#tplRow button').forEach(b=>{b.onclick=()=>{cardTpl=b.dataset.tpl;document.querySelectorAll('#tplRow button').forEach(x=>x.classList.toggle('on',x===b));renderCard();};});
 $('cardSave').onclick=()=>{const a=document.createElement('a');a.href=$('cardImg').src;a.download=(lastCardName?lastCardName+'_수수료카드':'수수료카드')+'.png';a.click();};
+$('cardShare').onclick=async()=>{try{const fn=(lastCardName?lastCardName+'_수수료카드':'수수료카드')+'.png';let blob=cardBlob;if(!blob){const res=await fetch($('cardImg').src);blob=await res.blob();}const file=new File([blob],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'예상 수수료·시책'});}else{$('cardSave').click();}}catch(e){if(e&&e.name!=='AbortError')$('cardSave').click();}};
+if(!(navigator.canShare)){$('cardShare').style.display='none';}
 if($('brandLogo'))$('brandLogo').src=LOGO_SRC;
 renderTabs();renderCalc();showCalc(false);
 $('introClose').onclick=()=>$('introModal').classList.remove('show');
