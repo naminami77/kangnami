@@ -198,7 +198,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.37 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.38 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -615,7 +615,7 @@ $('cardBranch').addEventListener('input',cardLive);
 $('cardModal').addEventListener('click',e=>{if(e.target===$('cardModal'))$('cardModal').classList.remove('show');});
 document.querySelectorAll('#tplRow button').forEach(b=>{b.onclick=()=>{cardTpl=b.dataset.tpl;document.querySelectorAll('#tplRow button').forEach(x=>x.classList.toggle('on',x===b));renderCard();};});
 $('cardSave').onclick=()=>{const a=document.createElement('a');a.href=$('cardImg').src;a.download=(lastCardName?lastCardName+'_수수료카드':'수수료카드')+'.png';a.click();};
-$('cardShare').onclick=async()=>{try{const fn=(lastCardName?lastCardName+'_수수료카드':'수수료카드')+'.png';let blob=cardBlob;if(!blob){const res=await fetch($('cardImg').src);blob=await res.blob();}const file=new File([blob],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){const _nm=lastCardName||'';const _msg=(_nm?_nm+' 파트너스님의':'파트너스님의')+' 수익 예상 금액입니다.\n감사합니다.';await navigator.share({files:[file],text:_msg});}else{$('cardSave').click();}}catch(e){if(e&&e.name!=='AbortError')$('cardSave').click();}};
+$('cardShare').onclick=async()=>{try{const fn=(lastCardName?lastCardName+'_수수료카드':'수수료카드')+'.png';let blob=cardBlob;if(!blob){const res=await fetch($('cardImg').src);blob=await res.blob();}const file=new File([blob],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){const _nm=lastCardName||'';const _msg=(_nm?_nm+' 파트너스님의':'파트너스님의')+' 익월 수수료 예상 금액입니다.\n감사합니다.';await navigator.share({files:[file],text:_msg});}else{$('cardSave').click();}}catch(e){if(e&&e.name!=='AbortError')$('cardSave').click();}};
 if(!(navigator.canShare)){$('cardShare').style.display='none';}
 if($('brandLogo'))$('brandLogo').src=LOGO_SRC;
 renderTabs();renderCalc();showCalc(false);
