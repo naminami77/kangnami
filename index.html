@@ -92,6 +92,16 @@
   .row .v.zero{color:var(--ink-faint)}
   .row.bond{border-top:1px dashed var(--line);margin-top:6px}
   .row.bond .k,.row.bond .v{color:var(--blue)}
+  .detail-btn{display:inline-block;margin-top:7px;font-family:inherit;font-size:11.5px;font-weight:700;color:var(--red-dark);background:var(--red-soft);border:none;border-radius:8px;padding:4px 10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .detail-btn:active{opacity:.85}
+  .m13-sub{font-size:12.5px;font-weight:700;color:var(--ink-soft);margin:-2px 0 12px}
+  .crit-table-wrap{max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+  .crit-table{width:100%;border-collapse:collapse;font-size:13px}
+  .crit-table th,.crit-table td{padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;border-top:1px solid var(--line)}
+  .crit-table thead th{position:sticky;top:0;background:#F7F8FA;color:var(--ink-soft);font-weight:800;font-size:12px;border-top:none}
+  .crit-table td:first-child,.crit-table th:first-child{text-align:left;color:var(--ink-soft);font-weight:700}
+  .crit-table tr.cur td{background:#FFF6F8;color:var(--red);font-weight:800}
+  .m13-note{font-size:11.5px;color:var(--ink-faint);line-height:1.6;margin-top:12px}
   .compare{margin-top:20px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .compare .ch{background:#F7F8FA;padding:9px 14px;font-size:11.5px;font-weight:800;color:var(--ink-soft);letter-spacing:.03em}
   .compare table{width:100%;border-collapse:collapse;font-size:13px}
@@ -198,7 +208,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.38 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.40 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -223,6 +233,18 @@
       </ul>
     </div>
     <div class="modal-actions"><button class="btn-save" id="critOk">확인</button></div>
+  </div>
+</div>
+
+<div class="modal" id="m13Modal">
+  <div class="modal-box">
+    <div class="mtitle"><span id="m13Title">13회차 성과 수수료 기준표</span><button class="mclose" id="m13Close">×</button></div>
+    <div class="m13-sub" id="m13Sub"></div>
+    <div class="crit-table-wrap">
+      <table class="crit-table" id="m13Table"></table>
+    </div>
+    <div class="m13-note">※ 현재 입력하신 수정보험료(수정P) 구간이 <b>강조</b> 표시됩니다. 표는 참고용이며, 실제 지급은 확정 수정P 기준으로 산정됩니다.</div>
+    <div class="modal-actions"><button class="btn-save" id="m13Ok">확인</button></div>
   </div>
 </div>
 
@@ -286,7 +308,7 @@ const CALCS={
         rows:[
           {k:'① 장기 신계약 성과 수수료',s:seon?'수정P × 83.3%':'수정P × 7.4%',v:c1},
           {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c5},
-          {k:'③ 신인 활동 지원비',s:'선지급형 한정',v:c2},
+          {k:'③ 신인 활동 지원비',s:'선지급형 한정',v:c2,detail:'sinhwalbi'},
           {k:'④ 플랫폼 시책 #1',s:'합격·MeAI',v:s1},
           {k:'⑤ 플랫폼 시책 #2',s:'합격·이행보증',v:s2},
           {k:'⑥ 플랫폼 시책 #3',s:'당월 실적자 / 2차년도 지급',v:s3},
@@ -326,8 +348,8 @@ const CALCS={
         rows:[
           {k:'① 장기 신계약 성과 수수료',s:seon?(pro?'수정P × 166.7%':'수정P × 83.3%'):(pb?'수정P × 13.3%':'수정P × 7.4%'),v:c1},
           {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c7},
-          {k:'③ 13회차 성과 수수료',s:'P선지급형/P프로선지급형 한정',v:c8},
-          {k:'④ 신인 활동 지원비',s:'P신인선지급형 한정',v:c2},
+          {k:'③ 13회차 성과 수수료',s:'P선지급형/P프로선지급형 한정',v:c8,detail:'m13_pro'},
+          {k:'④ 신인 활동 지원비',s:'P신인선지급형 한정',v:c2,detail:'sinhwalbi'},
           {k:'⑤ 플랫폼 시책 #1',s:'Active·모바일 MeAI',v:s4},
           {k:'⑥ 플랫폼 시책 #2',s:'Active·가계약',v:s5},
           {k:'⑦ 플랫폼 시책 #3',s:'Active·당월 매출 / 2차년도 지급',v:s9},
@@ -356,7 +378,7 @@ const CALCS={
         subs:[{k:'선지급 (익월)',v:nm},{k:'13회차',v:m13,note:'13회차 성과 + 연속가동'}],
         rows:[
           {k:'① 장기 신계약 수수료',s:'지급율 × 수정P',v:c1},
-          {k:'② 13회차 성과 수수료',s:'P선지급 기준표',v:c2},
+          {k:'② 13회차 성과 수수료',s:'P선지급 기준표',v:c2,detail:'m13SeonCross'},
           {k:'③ 1주차 구간 시책',s:'주차별 시책표',v:w1},
           {k:'④ 2주차 구간 시책',s:'주차별 시책표',v:w2},
           {k:'⑤ 3주차 구간 시책',s:'주차별 시책표',v:w3},
@@ -443,9 +465,10 @@ function compute(){
   const r=c.compute(st);
   $('totalCap').textContent=r.totalCap;countTo(r.total);
   $('subtotals').innerHTML=r.subs.map(s=>`<div class="subtotal"><div class="k">${s.k}</div><div class="v">${won(s.v)}</div></div>`).join('');
-  let html=r.rows.map(row=>`<div class="row"><span class="k">${row.k}<small>${row.s}</small></span><span class="v ${row.v?'':'zero'}">${won(row.v)}</span></div>`).join('');
+  let html=r.rows.map(row=>{const db=(row.detail&&row.v>0)?`<button class="detail-btn" data-m13="${row.detail}">📋 상세 보기</button>`:'';return `<div class="row"><span class="k">${row.k}<small>${row.s}</small>${db}</span><span class="v ${row.v?'':'zero'}">${won(row.v)}</span></div>`;}).join('');
   if(r.bond)html+=`<div class="row bond"><span class="k">${r.bond.k}</span><span class="v">${won(r.bond.v)}</span></div>`;
   $('rows').innerHTML=html;
+  $('rows').querySelectorAll('.detail-btn').forEach(b=>b.onclick=()=>showM13Detail(b.dataset.m13));
   const cmp=getCompare(c,st),isAdjP=cmp.isAdjP;
   $('compare').innerHTML=`<div class="ch">STEP 3 · ${cmp.header}</div>
     <table><thead><tr><th>${isAdjP?'수정P':'월납'}</th>${cmp.cols.map(x=>`<th>${x.label}</th>`).join('')}</tr></thead>
@@ -626,6 +649,36 @@ $('critBtn').onclick=()=>$('critModal').classList.add('show');
 $('critClose').onclick=()=>$('critModal').classList.remove('show');
 $('critOk').onclick=()=>$('critModal').classList.remove('show');
 $('critModal').addEventListener('click',e=>{if(e.target===$('critModal'))$('critModal').classList.remove('show');});
+// ── 13회차 성과 수수료 기준표 (상세 보기) ──
+const M13_META={
+  m13_pro:{title:'13회차 성과 수수료 기준표',sub:'P선지급형 · P프로선지급형 · 수정P 기준',col:'13회차 성과 수수료'},
+  m13SeonCross:{title:'13회차 성과 수수료 기준표',sub:'교차·전속 선지급 · 수정P 기준',col:'13회차 성과 수수료'},
+  sinhwalbi:{title:'신인 활동 지원비 기준표',sub:'선지급형 · 수정P 기준',col:'신인 활동 지원비'}
+};
+function m13Fmt(n){return n%10000===0?(n/10000)+'만':won(n);}
+function m13BracketRows(tbl,curAdjP){
+  const th=tbl.th,pay=tbl.pay;let curIdx=-1;
+  if(curAdjP!=null&&curAdjP>=th[0]){for(let k=0;k<th.length;k++){if(th[k]<=curAdjP)curIdx=k;else break;}}
+  let rows='';
+  if(th[0]>0)rows+=`<tr class="${(curAdjP!=null&&curAdjP<th[0])?'cur':''}"><td>${m13Fmt(th[0])} 미만</td><td>0원</td></tr>`;
+  for(let k=0;k<th.length;k++){
+    const low=th[k],high=(k+1<th.length)?th[k+1]:null;let range;
+    if(low===0)range=(high!=null)?`${m13Fmt(high)} 미만`:'전체';
+    else range=(high!=null)?`${m13Fmt(low)} 이상 ~ ${m13Fmt(high)} 미만`:`${m13Fmt(low)} 이상`;
+    rows+=`<tr class="${k===curIdx?'cur':''}"><td>${range}</td><td>${won(pay[k])}원</td></tr>`;
+  }
+  return rows;
+}
+function showM13Detail(key){
+  const tbl=LK[key],meta=M13_META[key];if(!tbl||!meta)return;
+  const st=baseV();const curAdjP=(st&&st.adjP!=null&&st.adjP!=='')?+st.adjP:null;
+  $('m13Title').textContent=meta.title;$('m13Sub').textContent=meta.sub;
+  $('m13Table').innerHTML=`<thead><tr><th>수정보험료(수정P) 구간</th><th>${meta.col||'지급액'}</th></tr></thead><tbody>${m13BracketRows(tbl,curAdjP)}</tbody>`;
+  $('m13Modal').classList.add('show');
+}
+$('m13Close').onclick=()=>$('m13Modal').classList.remove('show');
+$('m13Ok').onclick=()=>$('m13Modal').classList.remove('show');
+$('m13Modal').addEventListener('click',e=>{if(e.target===$('m13Modal'))$('m13Modal').classList.remove('show');});
 </script>
 </body>
 </html>
