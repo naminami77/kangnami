@@ -92,16 +92,6 @@
   .row .v.zero{color:var(--ink-faint)}
   .row.bond{border-top:1px dashed var(--line);margin-top:6px}
   .row.bond .k,.row.bond .v{color:var(--blue)}
-  .detail-btn{display:inline-block;margin-top:7px;font-family:inherit;font-size:11.5px;font-weight:700;color:var(--red-dark);background:var(--red-soft);border:none;border-radius:8px;padding:4px 10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .detail-btn:active{opacity:.85}
-  .m13-sub{font-size:12.5px;font-weight:700;color:var(--ink-soft);margin:-2px 0 12px}
-  .crit-table-wrap{max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
-  .crit-table{width:100%;border-collapse:collapse;font-size:13px}
-  .crit-table th,.crit-table td{padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;border-top:1px solid var(--line)}
-  .crit-table thead th{position:sticky;top:0;background:#F7F8FA;color:var(--ink-soft);font-weight:800;font-size:12px;border-top:none}
-  .crit-table td:first-child,.crit-table th:first-child{text-align:left;color:var(--ink-soft);font-weight:700}
-  .crit-table tr.cur td{background:#FFF6F8;color:var(--red);font-weight:800}
-  .m13-note{font-size:11.5px;color:var(--ink-faint);line-height:1.6;margin-top:12px}
   .compare{margin-top:20px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .compare .ch{background:#F7F8FA;padding:9px 14px;font-size:11.5px;font-weight:800;color:var(--ink-soft);letter-spacing:.03em}
   .compare table{width:100%;border-collapse:collapse;font-size:13px}
@@ -208,7 +198,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.42 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.39 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -233,30 +223,6 @@
       </ul>
     </div>
     <div class="modal-actions"><button class="btn-save" id="critOk">확인</button></div>
-  </div>
-</div>
-
-<div class="modal" id="m13Modal">
-  <div class="modal-box">
-    <div class="mtitle"><span id="m13Title">13회차 성과 수수료 기준표</span><button class="mclose" id="m13Close">×</button></div>
-    <div class="m13-sub" id="m13Sub"></div>
-    <div class="crit-table-wrap">
-      <table class="crit-table" id="m13Table"></table>
-    </div>
-    <div class="m13-note">※ 현재 입력하신 수정보험료(수정P) 구간이 <b>강조</b> 표시됩니다. 표는 참고용이며, 실제 지급은 확정 수정P 기준으로 산정됩니다.</div>
-    <div class="modal-actions"><button class="btn-save" id="m13Ok">확인</button></div>
-  </div>
-</div>
-
-<div class="modal" id="propModal">
-  <div class="modal-box">
-    <div class="mtitle"><span>2~18회차 비례 수수료 상세</span><button class="mclose" id="propClose">×</button></div>
-    <div class="m13-sub" id="propSub"></div>
-    <div class="crit-table-wrap">
-      <table class="crit-table" id="propTable"></table>
-    </div>
-    <div class="m13-note">※ 분급형에 한해 2~18회차에 걸쳐 매 회차 지급되는 수수료입니다. 회차당 수수료 = 수정P × 해당 요율이며, 표의 <b>합계</b>가 항목에 표시된 지급 총액입니다.</div>
-    <div class="modal-actions"><button class="btn-save" id="propOk">확인</button></div>
   </div>
 </div>
 
@@ -319,8 +285,8 @@ const CALCS={
         subs:[{k:'익월 지급',v:nm},{k:'2차년도 지급',v:yr2,note:'플랫폼 시책 #3'}],
         rows:[
           {k:'① 장기 신계약 성과 수수료',s:seon?'수정P × 83.3%':'수정P × 7.4%',v:c1},
-          {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c5,pdetail:{adjP:v.adjP,rounded:false,segs:[[2,12,11,0.074],[13,15,3,0.417],[16,18,3,0.458]],total:c5}},
-          {k:'③ 신인 활동 지원비',s:'선지급형 한정',v:c2,detail:'sinhwalbi'},
+          {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c5},
+          {k:'③ 신인 활동 지원비',s:'선지급형 한정',v:c2},
           {k:'④ 플랫폼 시책 #1',s:'합격·MeAI',v:s1},
           {k:'⑤ 플랫폼 시책 #2',s:'합격·이행보증',v:s2},
           {k:'⑥ 플랫폼 시책 #3',s:'당월 실적자 / 2차년도 지급',v:s3},
@@ -359,9 +325,9 @@ const CALCS={
         subs:[{k:'익월 지급',v:nm},{k:'2차년도 지급',v:yr2,note:'13회차 성과 + 플랫폼 시책 #3'}],
         rows:[
           {k:'① 장기 신계약 성과 수수료',s:seon?(pro?'수정P × 166.7%':'수정P × 83.3%'):(pb?'수정P × 13.3%':'수정P × 7.4%'),v:c1},
-          {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c7,pdetail:{adjP:v.adjP,rounded:true,segs:[[2,12,11,pb?0.133:0.074],[13,15,3,pb?0.142:0.417],[16,18,3,pb?0.154:0.458]],total:c7}},
-          {k:'③ 13회차 성과 수수료',s:'P선지급형/P프로선지급형 한정',v:c8,detail:'m13_pro'},
-          {k:'④ 신인 활동 지원비',s:'P신인선지급형 한정',v:c2,detail:'sinhwalbi'},
+          {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c7},
+          {k:'③ 13회차 성과 수수료',s:'P선지급형/P프로선지급형 한정',v:c8},
+          {k:'④ 신인 활동 지원비',s:'P신인선지급형 한정',v:c2},
           {k:'⑤ 플랫폼 시책 #1',s:'Active·모바일 MeAI',v:s4},
           {k:'⑥ 플랫폼 시책 #2',s:'Active·가계약',v:s5},
           {k:'⑦ 플랫폼 시책 #3',s:'Active·당월 매출 / 2차년도 지급',v:s9},
@@ -390,7 +356,7 @@ const CALCS={
         subs:[{k:'선지급 (익월)',v:nm},{k:'13회차',v:m13,note:'13회차 성과 + 연속가동'}],
         rows:[
           {k:'① 장기 신계약 수수료',s:'지급율 × 수정P',v:c1},
-          {k:'② 13회차 성과 수수료',s:'P선지급 기준표',v:c2,detail:'m13SeonCross'},
+          {k:'② 13회차 성과 수수료',s:'P선지급 기준표',v:c2},
           {k:'③ 1주차 구간 시책',s:'주차별 시책표',v:w1},
           {k:'④ 2주차 구간 시책',s:'주차별 시책표',v:w2},
           {k:'⑤ 3주차 구간 시책',s:'주차별 시책표',v:w3},
@@ -441,6 +407,15 @@ function renderCalc(){
       const b=document.createElement('button');b.className='on';b.textContent=forced;b.style.pointerEvents='none';
       seg.appendChild(b);field.appendChild(seg);box.appendChild(field);return;
     }
+    if(cur==='E2'&&f.id==='consult'&&lookup&&lookup.act==='Chance'){
+      if(st[f.id]===undefined)st[f.id]=f.def;
+      const seg=document.createElement('div');seg.className='seg';seg.style.opacity='.4';seg.style.pointerEvents='none';
+      f.opts.forEach(o=>{const b=document.createElement('button');b.textContent=o;b.className=(st[f.id]===o?'on':'');seg.appendChild(b);});
+      field.appendChild(seg);
+      const nt=document.createElement('div');nt.style.cssText='margin-top:7px;font-size:12px;color:var(--ink-faint);font-weight:600';
+      nt.textContent='Chance 단계에서는 적용되지 않는 항목입니다 (시책 계산 미반영).';
+      field.appendChild(nt);box.appendChild(field);return;
+    }
     if(f.type==='seg'){
       const seg=document.createElement('div');seg.className='seg';
       f.opts.forEach(o=>{const b=document.createElement('button');b.textContent=o;b.className=st[f.id]===o?'on':'';
@@ -472,17 +447,14 @@ function updateCalcState(){
 function showTabs(b){$('tabs').style.display=b?'':'none';}
 function showGrid(b){$('calcGrid').style.display=b?'':'none';}
 function showCalc(b){showTabs(b);showGrid(b);}
-let curPdetail=null;
 function compute(){
   const c=CALCS[cur];const st=baseV();
   const r=c.compute(st);
   $('totalCap').textContent=r.totalCap;countTo(r.total);
   $('subtotals').innerHTML=r.subs.map(s=>`<div class="subtotal"><div class="k">${s.k}</div><div class="v">${won(s.v)}</div></div>`).join('');
-  curPdetail=null;
-  let html=r.rows.map(row=>{let db='';if(row.detail&&row.v>0)db=`<button class="detail-btn" data-m13="${row.detail}">📋 상세 보기</button>`;else if(row.pdetail&&row.v>0){curPdetail=row.pdetail;db=`<button class="detail-btn" data-prop="1">📋 상세 보기</button>`;}return `<div class="row"><span class="k">${row.k}<small>${row.s}</small>${db}</span><span class="v ${row.v?'':'zero'}">${won(row.v)}</span></div>`;}).join('');
+  let html=r.rows.map(row=>`<div class="row"><span class="k">${row.k}<small>${row.s}</small></span><span class="v ${row.v?'':'zero'}">${won(row.v)}</span></div>`).join('');
   if(r.bond)html+=`<div class="row bond"><span class="k">${r.bond.k}</span><span class="v">${won(r.bond.v)}</span></div>`;
   $('rows').innerHTML=html;
-  $('rows').querySelectorAll('.detail-btn').forEach(b=>b.onclick=()=>{if(b.dataset.prop)showPropDetail();else showM13Detail(b.dataset.m13);});
   const cmp=getCompare(c,st),isAdjP=cmp.isAdjP;
   $('compare').innerHTML=`<div class="ch">STEP 3 · ${cmp.header}</div>
     <table><thead><tr><th>${isAdjP?'수정P':'월납'}</th>${cmp.cols.map(x=>`<th>${x.label}</th>`).join('')}</tr></thead>
@@ -658,72 +630,11 @@ if($('brandLogo'))$('brandLogo').src=LOGO_SRC;
 renderTabs();renderCalc();showCalc(false);
 $('introClose').onclick=()=>$('introModal').classList.remove('show');
 $('introModal').addEventListener('click',e=>{if(e.target===$('introModal'))$('introModal').classList.remove('show');});
-// 안내 팝업: 하루 한 번만 표시 (마지막 표시 날짜를 저장, 오늘 이미 봤으면 건너뜀)
-(function(){
-  const KEY='mp_intro_lastShown';
-  const d=new Date();
-  const today=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-  let last=null;
-  try{last=localStorage.getItem(KEY);}catch(e){}
-  if(last!==today){
-    $('introModal').classList.add('show');
-    try{localStorage.setItem(KEY,today);}catch(e){}
-  }
-})();
+$('introModal').classList.add('show');
 $('critBtn').onclick=()=>$('critModal').classList.add('show');
 $('critClose').onclick=()=>$('critModal').classList.remove('show');
 $('critOk').onclick=()=>$('critModal').classList.remove('show');
 $('critModal').addEventListener('click',e=>{if(e.target===$('critModal'))$('critModal').classList.remove('show');});
-// ── 13회차 성과 수수료 기준표 (상세 보기) ──
-const M13_META={
-  m13_pro:{title:'13회차 성과 수수료 기준표',sub:'P선지급형 · P프로선지급형 · 수정P 기준',col:'13회차 성과 수수료'},
-  m13SeonCross:{title:'13회차 성과 수수료 기준표',sub:'교차·전속 선지급 · 수정P 기준',col:'13회차 성과 수수료'},
-  sinhwalbi:{title:'신인 활동 지원비 기준표',sub:'선지급형 · 수정P 기준',col:'신인 활동 지원비'}
-};
-function m13Fmt(n){return n%10000===0?(n/10000)+'만':won(n);}
-function m13BracketRows(tbl,curAdjP){
-  const th=tbl.th,pay=tbl.pay;let curIdx=-1;
-  if(curAdjP!=null&&curAdjP>=th[0]){for(let k=0;k<th.length;k++){if(th[k]<=curAdjP)curIdx=k;else break;}}
-  let rows='';
-  if(th[0]>0)rows+=`<tr class="${(curAdjP!=null&&curAdjP<th[0])?'cur':''}"><td>${m13Fmt(th[0])} 미만</td><td>0원</td></tr>`;
-  for(let k=0;k<th.length;k++){
-    const low=th[k],high=(k+1<th.length)?th[k+1]:null;let range;
-    if(low===0)range=(high!=null)?`${m13Fmt(high)} 미만`:'전체';
-    else range=(high!=null)?`${m13Fmt(low)} 이상 ~ ${m13Fmt(high)} 미만`:`${m13Fmt(low)} 이상`;
-    rows+=`<tr class="${k===curIdx?'cur':''}"><td>${range}</td><td>${won(pay[k])}원</td></tr>`;
-  }
-  return rows;
-}
-function showM13Detail(key){
-  const tbl=LK[key],meta=M13_META[key];if(!tbl||!meta)return;
-  const st=baseV();const curAdjP=(st&&st.adjP!=null&&st.adjP!=='')?+st.adjP:null;
-  $('m13Title').textContent=meta.title;$('m13Sub').textContent=meta.sub;
-  $('m13Table').innerHTML=`<thead><tr><th>수정보험료(수정P) 구간</th><th>${meta.col||'지급액'}</th></tr></thead><tbody>${m13BracketRows(tbl,curAdjP)}</tbody>`;
-  $('m13Modal').classList.add('show');
-}
-$('m13Close').onclick=()=>$('m13Modal').classList.remove('show');
-$('m13Ok').onclick=()=>$('m13Modal').classList.remove('show');
-$('m13Modal').addEventListener('click',e=>{if(e.target===$('m13Modal'))$('m13Modal').classList.remove('show');});
-// ── 2~18회차 비례 수수료 상세 (회차 구간별 요율 분해) ──
-function showPropDetail(){
-  const d=curPdetail;if(!d)return;
-  let sum=0,body='';
-  d.segs.forEach(seg=>{
-    const from=seg[0],to=seg[1],months=seg[2],rate=seg[3];
-    const per=d.rounded?rd(d.adjP*rate):d.adjP*rate;
-    const sub=per*months;sum+=sub;
-    const pct=(rate*100).toFixed(1).replace(/\.0$/,'')+'%';
-    body+=`<tr><td>${from}~${to}회차 (${months}회)</td><td>${pct}</td><td>${won(per)}원</td><td>${won(sub)}원</td></tr>`;
-  });
-  const totMonths=d.segs.reduce((a,s)=>a+s[2],0);
-  body+=`<tr class="cur"><td>합계 (${totMonths}회)</td><td>—</td><td>—</td><td>${won(sum)}원</td></tr>`;
-  $('propSub').textContent='수정P '+won(d.adjP)+'원 기준 · 회차당 수수료 = 수정P × 요율';
-  $('propTable').innerHTML=`<thead><tr><th>회차 구간</th><th>요율</th><th>회차당 수수료</th><th>소계</th></tr></thead><tbody>${body}</tbody>`;
-  $('propModal').classList.add('show');
-}
-$('propClose').onclick=()=>$('propModal').classList.remove('show');
-$('propOk').onclick=()=>$('propModal').classList.remove('show');
-$('propModal').addEventListener('click',e=>{if(e.target===$('propModal'))$('propModal').classList.remove('show');});
 </script>
 </body>
 </html>
