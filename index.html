@@ -198,7 +198,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.39 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.40 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -410,7 +410,7 @@ function renderCalc(){
     if(cur==='E2'&&f.id==='consult'&&lookup&&lookup.act==='Chance'){
       if(st[f.id]===undefined)st[f.id]=f.def;
       const seg=document.createElement('div');seg.className='seg';seg.style.opacity='.4';seg.style.pointerEvents='none';
-      f.opts.forEach(o=>{const b=document.createElement('button');b.textContent=o;b.className=(st[f.id]===o?'on':'');seg.appendChild(b);});
+      f.opts.forEach(o=>{const b=document.createElement('button');b.textContent=o;seg.appendChild(b);});
       field.appendChild(seg);
       const nt=document.createElement('div');nt.style.cssText='margin-top:7px;font-size:12px;color:var(--ink-faint);font-weight:600';
       nt.textContent='Chance 단계에서는 적용되지 않는 항목입니다 (시책 계산 미반영).';
