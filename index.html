@@ -209,7 +209,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.46 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.47 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -302,9 +302,10 @@ function mascotKey(){if(cur==='N')return 'rookie';if(cur==='X')return 'cross';if
 const isProBasic=f=>(f==='P프로기본형'||f==='P기본형');
 
 const CALCS={
-  N:{title:'1차월 신인',sub:'이행보증 가입 여부로 선지급/분급 자동 판정',sabun:false,
+  N:{title:'1차월 신인',sub:'이행보증=선지급/분급 · 트랙=신인/프로 · 루키 시책 적용',sabun:false,
     inputs:[
       {id:'pass',type:'seg',label:'당월 합격 여부',opts:['O','X'],def:'O'},
+      {id:'track',type:'seg',label:'수수료 트랙',sm:'신인=루키 요율 · 프로=P프로 요율(166.7%/프로 비례)',opts:['신인','프로'],def:'신인'},
       {id:'meai',type:'seg',label:'MeAI 보장분석',sm:'응시 +3영업일',opts:['충족','미충족'],def:'충족'},
       {id:'bond',type:'seg',label:'이행보증보험 가입',sm:'가입=선지급 · 미가입=분급',opts:['가입','미가입'],def:'가입'},
       {id:'pay9',type:'num',label:'응시 9영업일 이내 월납',sm:'플랫폼 시책 #2 기준',def:50000},
@@ -312,24 +313,32 @@ const CALCS={
       {id:'adjP',type:'num',label:'당월 총 수정보험료 (수정P)',def:120000},
     ],
     compute(v){
-      const seon=(v.bond==='가입'),passO=(v.pass==='O');
-      const c1=seon?rd(v.adjP*0.833):rd(v.adjP*0.074);
-      const c2=seon?br(v.adjP,LK.sinhwalbi):0;
+      const seon=(v.bond==='가입'),passO=(v.pass==='O'),pro=(v.track==='프로');
+      // ① 장기 신계약 성과: 선지급=신인83.3%/프로166.7%, 분급 1회차=신인7.4%/프로13.3%
+      const c1=seon?(pro?rd(v.adjP*1.667):rd(v.adjP*0.833)):(pro?rd(v.adjP*0.133):rd(v.adjP*0.074));
+      // ③ 신인 활동 지원비: 신인선지급형 한정(프로 제외)
+      const c2=(seon&&!pro)?br(v.adjP,LK.sinhwalbi):0;
+      // ⑧ 13회차 성과: 프로선지급형 한정
+      const c8=(seon&&pro)?br(v.adjP,LK.m13_pro):0;
       const s1=(passO&&v.meai==='충족')?br(v.m,LK.plat1):0;
       const s2=(passO&&seon)?br(v.pay9,LK.plat2):0;
       const nm=c1+c2+s1+s2;
-      const c5=seon?0:(v.adjP*0.074*11+v.adjP*0.417*3+v.adjP*0.458*3);
+      // ② 2~18회차 비례(분급 한정): 신인 7.4/41.7/45.8, 프로 13.3/14.2/15.4
+      const r1=pro?0.133:0.074, r2=pro?0.142:0.417, r3=pro?0.154:0.458;
+      const c5=seon?0:(v.adjP*r1*11+v.adjP*r2*3+v.adjP*r3*3);
       const s3=passO?br(v.m,LK.plat3):0;
-      const yr2=s3;
+      const yr2=c8+s3;
+      const seonLabel=seon?(pro?'수정P × 166.7%':'수정P × 83.3%'):(pro?'수정P × 13.3%':'수정P × 7.4%');
       return {totalCap:'수수료/시책 총액',total:nm+c5+yr2,
-        subs:[{k:'익월 지급',v:nm},{k:'2차년도 지급',v:yr2,note:'플랫폼 시책 #3'}],
+        subs:[{k:'익월 지급',v:nm},{k:'2차년도 지급',v:yr2,note:pro?'13회차 성과 + 플랫폼 시책 #3':'플랫폼 시책 #3'}],
         rows:[
-          {k:'① 장기 신계약 성과 수수료',s:seon?'수정P × 83.3%':'수정P × 7.4%',v:c1},
-          {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c5,pdetail:{adjP:v.adjP,rounded:false,segs:[[2,12,11,0.074],[13,15,3,0.417],[16,18,3,0.458]],total:c5}},
-          {k:'③ 신인 활동 지원비',s:'선지급형 한정',v:c2,detail:'sinhwalbi'},
-          {k:'④ 플랫폼 시책 #1',s:'합격·MeAI',v:s1},
-          {k:'⑤ 플랫폼 시책 #2',s:'합격·이행보증',v:s2},
-          {k:'⑥ 플랫폼 시책 #3',s:'당월 실적자 / 2차년도 지급',v:s3},
+          {k:'① 장기 신계약 성과 수수료',s:seonLabel,v:c1},
+          {k:'② 2~18회차 비례 수수료',s:'분급형 한정·매월',v:c5,pdetail:{adjP:v.adjP,rounded:false,segs:[[2,12,11,r1],[13,15,3,r2],[16,18,3,r3]],total:c5}},
+          {k:'③ 13회차 성과 수수료',s:'프로선지급형 한정 / 2차년도 지급',v:c8,detail:'m13_pro'},
+          {k:'④ 신인 활동 지원비',s:'신인선지급형 한정',v:c2,detail:'sinhwalbi'},
+          {k:'⑤ 플랫폼 시책 #1',s:'합격·MeAI',v:s1},
+          {k:'⑥ 플랫폼 시책 #2',s:'합격·이행보증',v:s2},
+          {k:'⑦ 플랫폼 시책 #3',s:'당월 실적자 / 2차년도 지급',v:s3},
         ]};
     },
     compare(st){return {header:'월납별 예상 수수료 예시(수정P = 월납의 2배 예상)',
