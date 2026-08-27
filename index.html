@@ -209,7 +209,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.48 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.49 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -302,7 +302,7 @@ function mascotKey(){if(cur==='N')return 'rookie';if(cur==='X')return 'cross';if
 const isProBasic=f=>(f==='P프로기본형'||f==='P기본형');
 
 const CALCS={
-  N:{title:'1차월 신인',sub:'이행보증=선지급/분급 · 트랙=신인/프로 · 루키 시책 적용',sabun:false,
+  N:{title:'1차월 당월 합격',sub:'이행보증=선지급/분급 · 트랙=신인/프로 · 루키 시책 적용',sabun:false,
     inputs:[
       {id:'pass',type:'seg',label:'당월 합격 여부',opts:['O','X'],def:'O'},
       {id:'track',type:'seg',label:'수수료 트랙',sm:'신인=루키 요율 · 프로=P프로 요율(166.7%/프로 비례)',opts:['신인','프로'],def:'신인'},
@@ -344,7 +344,7 @@ const CALCS={
     compare(st){return {header:'월납별 예상 수수료 예시(수정P = 월납의 2배 예상)',
       cols:COLS.map(m=>({label:(m/10000)+'만',total:CALCS.N.compute({...st,m,pay9:m,adjP:m*P_MULT}).total})),isAdjP:false};}
   },
-  E2:{title:'2차월 이상 또는 경력',sub:'사번 조회 · 이행보증 가입 여부로 선지급/분급 판정',sabun:true,
+  E2:{title:'2차월 이상 / 1차월 타사 합격',sub:'사번 조회 · 이행보증 가입 여부로 선지급/분급 판정',sabun:true,
     inputs:[
       {id:'bond',type:'seg',label:'이행보증보험',opts:['가입','미가입'],def:'가입'},
       {id:'mo',type:'seg',label:'모바일 고객등록 & MeAI',opts:['충족','미충족'],def:'충족'},
@@ -384,7 +384,7 @@ const CALCS={
           {k:'⑨ 1차월 경력 스팟 시책',s:'1차월 타사 합격자',v:s3},
         ]};
     }},
-  X:{title:'교차·전속 · 선지급형',sub:'교차 & 전속 · 주차별 실적·연속가동 기반 (사번 조회 없음)',sabun:false,
+  X:{title:'교차/전속 · 선지급형',sub:'교차 & 전속 · 주차별 실적·연속가동 기반 (사번 조회 없음)',sabun:false,
     inputs:[
       {id:'rate',type:'num',label:'지급율',fixed:'250%',fixedVal:2.5,def:2.5},
       {id:'prevM',type:'num',label:'전월 월납보험료',sm:'연속가동 판정',def:50000},
@@ -421,7 +421,7 @@ function getCompare(c,st){
   if(c.compare)return c.compare(st);
   return {header:'월납별 예상 수수료 예시(수정P = 월납의 2배 예상)',cols:COLS.map(m=>({label:(m/10000)+'만',total:c.compute({...st,m,adjP:m*P_MULT}).total})),isAdjP:false};
 }
-const TAB_ORDER=[['N','1차월 신인/경력'],['E2','2차월 이상 신인/경력'],['X','교차·전속']];
+const TAB_ORDER=[['N','1차월 당월 합격'],['E2','2차월 이상 / 1차월 타사 합격'],['X','교차/전속']];
 let cur='E2',lookup=null;
 const state={N:{},E2:{},X:{}};
 const $=id=>document.getElementById(id);
