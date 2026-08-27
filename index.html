@@ -209,7 +209,7 @@
     </div>
   </div>
   <footer class="foot">
-    <div class="credit">메리츠 파트너스 · V3.5.47 · 데이터 기준 2608</div>
+    <div class="credit">메리츠 파트너스 · V3.5.48 · 데이터 기준 2608</div>
   </footer>
 
 <div class="modal" id="critModal">
@@ -421,7 +421,7 @@ function getCompare(c,st){
   if(c.compare)return c.compare(st);
   return {header:'월납별 예상 수수료 예시(수정P = 월납의 2배 예상)',cols:COLS.map(m=>({label:(m/10000)+'만',total:c.compute({...st,m,adjP:m*P_MULT}).total})),isAdjP:false};
 }
-const TAB_ORDER=[['N','1차월 신인'],['E2','2차월 이상 또는 경력'],['X','교차·전속']];
+const TAB_ORDER=[['N','1차월 신인/경력'],['E2','2차월 이상 신인/경력'],['X','교차·전속']];
 let cur='E2',lookup=null;
 const state={N:{},E2:{},X:{}};
 const $=id=>document.getElementById(id);
