@@ -313,9 +313,9 @@ const CALCS={
       {id:'bond',type:'seg',label:'🛡️ 이행보증보험 가입',sm:'가입=선지급 · 미가입=분급',opts:['가입','미가입'],def:'가입'},
       {id:'track',type:'seg',label:'💰 수수료 유형',sm:'P신인=순수신인(1~12차월) · P프로=13차월 이상 / 경력',opts:['P신인','P프로'],def:'P신인'},
       {id:'meai',type:'seg',label:'📊 MeAI 보장분석',sm:'응시 +3영업일',opts:['충족','미충족'],def:'충족'},
-      {id:'pay9',type:'num',label:'📅 응시 9영업일 이내 월납',sm:'플랫폼 시책 #2 기준',def:50000},
-      {id:'m',type:'num',label:'📅 당월 총 월납',def:50000},
-      {id:'adjP',type:'num',label:'📅 당월 총 수정보험료 (수정P)',def:120000},
+      {id:'pay9',type:'num',label:'📅 응시 9영업일 이내 월납',sm:'플랫폼 시책 #2 기준',def:50000,group:'pay'},
+      {id:'m',type:'num',label:'📅 당월 총 월납',def:50000,group:'pay'},
+      {id:'adjP',type:'num',label:'📅 당월 총 수정보험료 (수정P)',def:120000,group:'pay'},
     ],
     compute(v){
       const seon=(v.bond==='가입'),pro=(v.track==='P프로');
@@ -360,8 +360,8 @@ const CALCS={
       {id:'bond',type:'seg',label:'🛡️ 이행보증보험',opts:['가입','미가입'],def:'가입'},
       {id:'mo',type:'seg',label:'📊 모바일 고객등록 & MeAI',opts:['충족','미충족'],def:'충족'},
       {id:'consult',type:'seg',label:'📝 모바일 상담신청',sm:'3영업일 가계약',opts:['충족','미충족'],def:'충족'},
-      {id:'m',type:'num',label:'📅 당월 총 월납',def:100000},
-      {id:'adjP',type:'num',label:'📅 당월 총 수정보험료 (수정P)',def:220000},
+      {id:'m',type:'num',label:'📅 당월 총 월납',def:100000,group:'pay'},
+      {id:'adjP',type:'num',label:'📅 당월 총 수정보험료 (수정P)',def:220000,group:'pay'},
     ],
     compute(v){
       const act=v._act,mon=v._mon,fee=v._fee;
@@ -451,14 +451,24 @@ function renderCalc(){
     const fl=document.createElement('label');fl.className='label';fl.innerHTML='수수료유형 <span class="sm">· 월초 재적 기준. 유형 변경 시 재선택 하세요.'+(chg?' (수동 변경됨)':'')+'</span>';fd.appendChild(fl);
     const sel=document.createElement('select');sel.className='feesel';const opts=[lookup.fee];if(PAIR[lookup.fee])opts.push(PAIR[lookup.fee]);opts.forEach(ft=>{const o=document.createElement('option');o.value=ft;o.textContent=ft;if(ft===eff)o.selected=true;sel.appendChild(o);});
     sel.onchange=()=>{st.feeOv=(sel.value===lookup.fee?undefined:sel.value);renderCalc();};fd.appendChild(sel);box.appendChild(fd);}
-  let glowAssigned=false;
+  const isFieldDone=(f)=>{
+    const isFixed=!!f.fixed;
+    const isForcedBond=(cur==='E2'&&f.id==='bond'&&lookup);
+    return isFixed||isForcedBond||(st[f.id]!==undefined&&st[f.id]!=='');
+  };
+  const units=[];
+  c.inputs.forEach(f=>{
+    const last=units[units.length-1];
+    if(f.group&&last&&last.group===f.group){last.fields.push(f);}
+    else{units.push({group:f.group||null,fields:[f]});}
+  });
+  const glowUnit=units.find(u=>!u.fields.every(isFieldDone));
+  const glowFieldIds=glowUnit?new Set(glowUnit.fields.map(x=>x.id)):new Set();
   c.inputs.forEach(f=>{
     const field=document.createElement('div');field.className='field';
     const lab=document.createElement('label');lab.className='label';
-    const isFixed=!!f.fixed;
-    const isForcedBond=(cur==='E2'&&f.id==='bond'&&lookup);
-    const hasVal=isFixed||isForcedBond||(st[f.id]!==undefined&&st[f.id]!=='');
-    if(!hasVal&&!glowAssigned){lab.classList.add('next-glow');glowAssigned=true;}
+    if(glowFieldIds.has(f.id)){lab.classList.add('next-glow');}
+    lab.dataset.fid=f.id;
     lab.innerHTML=f.label+(f.sm?` <span class="sm">· ${f.sm}</span>`:'');field.appendChild(lab);
     if(f.fixed){st[f.id]=f.fixedVal;
       const pill=document.createElement('div');pill.className='static-pill';pill.textContent=f.fixed+' · 고정';
@@ -477,11 +487,30 @@ function renderCalc(){
     }else{
       const inp=document.createElement('input');inp.type='text';inp.className='numin';inp.inputMode='numeric';inp.placeholder='입력';
       inp.value=(st[f.id]!==undefined?Number(st[f.id]).toLocaleString('ko-KR'):'');
-      inp.oninput=()=>{const raw=inp.value.replace(/[^0-9]/g,'');if(raw===''){delete st[f.id];inp.value='';}else{const n=+raw;st[f.id]=n;inp.value=n.toLocaleString('ko-KR');}updateCalcState();};field.appendChild(inp);
+      inp.oninput=()=>{const raw=inp.value.replace(/[^0-9]/g,'');if(raw===''){delete st[f.id];inp.value='';}else{const n=+raw;st[f.id]=n;inp.value=n.toLocaleString('ko-KR');}updateCalcState();refreshGlow();};field.appendChild(inp);
     }
     box.appendChild(field);
   });
   updateCalcState();
+}
+function refreshGlow(){
+  const c=CALCS[cur],st=baseV();
+  const isFieldDone=(f)=>{
+    const isFixed=!!f.fixed;
+    const isForcedBond=(cur==='E2'&&f.id==='bond'&&lookup);
+    return isFixed||isForcedBond||(st[f.id]!==undefined&&st[f.id]!=='');
+  };
+  const units=[];
+  c.inputs.forEach(f=>{
+    const last=units[units.length-1];
+    if(f.group&&last&&last.group===f.group){last.fields.push(f);}
+    else{units.push({group:f.group||null,fields:[f]});}
+  });
+  const glowUnit=units.find(u=>!u.fields.every(isFieldDone));
+  const glowFieldIds=glowUnit?new Set(glowUnit.fields.map(x=>x.id)):new Set();
+  document.querySelectorAll('#calcGrid .label[data-fid]').forEach(lab=>{
+    lab.classList.toggle('next-glow',glowFieldIds.has(lab.dataset.fid));
+  });
 }
 function baseV(){
   const c=CALCS[cur];const st={...state[cur]};
